@@ -1,0 +1,6 @@
+asgiref
+Django
+django-filter
+djangorestframework
+Markdown
+sqlparse
