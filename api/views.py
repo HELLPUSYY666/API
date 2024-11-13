@@ -5,12 +5,26 @@ from rest_framework import status
 from .models import User
 from .serializer import UserSerializer
 from rest_framework.views import APIView
+from rest_framework import generics
+
+
+class UserAPIList(generics.ListCreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 
 class UserAPIView(APIView):
-    def get(self, request):
-        users = User.objects.all()
-        return Response({'posts': UserSerializer(users, many=True).data})
+    def get(self, request, *args, **kwargs):
+        pk = kwargs.get('pk', None)
+        if pk:
+            try:
+                user = User.objects.get(pk=pk)
+            except User.DoesNotExist:
+                return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'post': UserSerializer(user).data})
+        else:
+            users = User.objects.all()
+            return Response({'posts': UserSerializer(users, many=True).data})
 
     def post(self, request):
         serializer = UserSerializer(data=request.data)
