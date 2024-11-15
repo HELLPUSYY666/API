@@ -6,9 +6,9 @@ import random
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('email', 'first_name', 'last_name', 'mobile', 'date_joined')  # Убедитесь, что эти поля существуют
-    list_editable = ('first_name', 'last_name')  # Убедитесь, что эти поля существуют
-    search_fields = ('first_name', 'last_name', 'email')  # Используйте правильные поля для поиска
+    list_display = ('email', 'first_name', 'last_name', 'mobile', 'date_joined')
+    list_editable = ('first_name', 'last_name')
+    search_fields = ('first_name', 'last_name', 'email')
 
     @admin.display(ordering='-age', description='Возрастной статус')
     def age_status(self, user):

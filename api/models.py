@@ -37,7 +37,7 @@ class CustomUserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     password = models.CharField(max_length=128, null=True)
-    email = models.EmailField(db_index=True, unique=True, max_length=254,null=True)
+    email = models.EmailField(db_index=True, unique=True, max_length=254, null=True)
     first_name = models.CharField(max_length=240, null=True)
     last_name = models.CharField(max_length=255, null=True)
     mobile = models.CharField(max_length=20, null=True)
@@ -64,6 +64,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         blank=True
     )
 
+    def __str__(self):
+        return self.email if self.email else f"User-{self.id}"
+
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'
@@ -76,12 +79,3 @@ class Category(models.Model):
         return self.name
 
 
-class Post(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
-    title = models.CharField(max_length=255)
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.title
