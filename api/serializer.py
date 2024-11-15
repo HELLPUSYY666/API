@@ -3,8 +3,6 @@ from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-
     class Meta:
         model = User
         fields = '__all__'
