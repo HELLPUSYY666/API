@@ -10,7 +10,9 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'full_name', 'email', 'groups', 'mobile', 'date_joined']
 
     def get_full_name(self, obj):
-        return f"{obj.first_name} {obj.last_name}"
+        first_name = obj.first_name or ''
+        last_name = obj.last_name or ''
+        return f"{first_name} {last_name}".strip()
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -30,9 +32,13 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 class GroupSerializer(serializers.ModelSerializer):
-    members = UserSerializer(many=True, read_only=True)
-    posts = PostSerializer(source='user.posts', many=True, read_only=True)
+    members = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True)
+    posts = serializers.SerializerMethodField()
 
     class Meta:
         model = Group
         fields = '__all__'
+
+    def get_posts(self, obj):
+        posts = Post.objects.filter(user__in=obj.members.all())
+        return PostSerializer(posts, many=True).data
