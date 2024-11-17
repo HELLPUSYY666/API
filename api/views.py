@@ -4,9 +4,9 @@ from rest_framework.decorators import api_view, action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework import status, viewsets
-from .models import User, Category
+from .models import User, Category, Post
 from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
-from .serializer import UserSerializer
+from .serializer import UserSerializer, PostSerializer
 from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
@@ -36,3 +36,19 @@ class UserAPIDelete(generics.RetrieveDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAdminOrReadOnly]
+
+
+class PostAPIListPagination(PageNumberPagination):
+    page_size = 3
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+

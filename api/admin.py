@@ -1,5 +1,5 @@
 from django.contrib import admin
-from api.models import User, Category
+from api.models import User, Category, Profile, Post, Group
 from django.db.models import QuerySet
 import random
 
@@ -87,3 +87,29 @@ class RatingFilter(admin.SimpleListFilter):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name',)
+
+
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'bio',)
+    search_fields = ('user__first_name', 'user__last_name', 'user__email')
+
+
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    list_display = ('user', 'title',)
+    search_fields = ('user__first_name', 'user__last_name', 'user__email')
+
+    @admin.display(ordering='title')
+    def title(self, obj):
+        return obj.title
+
+
+@admin.register(Group)
+class GroupAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
+
+    @admin.display(ordering='name')
+    def name(self, obj):
+        return obj.name

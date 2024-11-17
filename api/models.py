@@ -79,3 +79,30 @@ class Category(models.Model):
         return self.name
 
 
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE,
+                                related_name='profile')  # у каждого пользователя только один профиль и  у каждого профиля один пользователь
+    bio = models.TextField(null=True, blank=True)
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+
+    def __str__(self):
+        return f"Профиль пользователя {self.user.email}"
+
+
+class Post(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             related_name='posts')  # пользовтаель может создавать много постов
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+
+    def __str__(self):
+        return self.title
+
+
+class Group(models.Model):
+    name = models.CharField(max_length=100)
+    members = models.ManyToManyField(User,
+                                     related_name='custom_groups')  # пользователь может быть участником многих групп и у многих групп много участников
+
+    def __str__(self):
+        return self.name
