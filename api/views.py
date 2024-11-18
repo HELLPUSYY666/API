@@ -19,25 +19,33 @@ class UserAPIListPagination(PageNumberPagination):
     max_page_size = 100
 
 
-class UserAPIList(generics.ListCreateAPIView):
+class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = UserAPIListPagination
     authentication_classes = [TokenAuthentication]  # Подключение аутентификации через токен
 
 
-class UserAPIDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication]  # Подключение аутентификации через токен
-
-
-class UserAPIDelete(generics.RetrieveDestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [IsAdminOrReadOnly]
+# class UserAPIList(generics.ListCreateAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
+#     permission_classes = [IsAuthenticatedOrReadOnly]
+#     pagination_class = UserAPIListPagination
+#     authentication_classes = [TokenAuthentication]  # Подключение аутентификации через токен
+#
+#
+# class UserAPIDetail(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
+#     permission_classes = [IsAuthenticated]
+#     authentication_classes = [TokenAuthentication]  # Подключение аутентификации через токен
+#
+#
+# class UserAPIDelete(generics.RetrieveDestroyAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
+#     permission_classes = [IsAdminOrReadOnly]
 
 
 class PostAPIListPagination(PageNumberPagination):

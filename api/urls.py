@@ -9,17 +9,12 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from rest_framework.routers import DefaultRouter
-
-router = DefaultRouter()
-router.register('posts', PostViewSet, basename='post')
-router.register('profile', ProfileViewSet, basename='profile')
-router.register('groups', GroupViewSet, basename='group')
 
 urlpatterns = [
-    path('users/', UserAPIList.as_view(), name='user-list'),
-    path('users/<int:pk>/', UserAPIDetail.as_view(), name='user-detail'),
-    path('users/<int:pk>/delete/', UserAPIDelete.as_view(), name='user-delete'),
+    path('users/', UserViewSet.as_view({'get': 'list'}), name='user-list'),
+    path('users/create/', UserViewSet.as_view({'post': 'create'}), name='user-create'),
+    path('users/<int:pk>/', UserViewSet.as_view({'get': 'list', 'put': 'update'}), name='user-detail'),
+    path('users/<int:pk>/delete/', UserViewSet.as_view({'get': 'list', 'delete': 'destroy'}), name='user-delete'),
     path('auth/', include(djoser.urls)),
     re_path(r'^auth/', include('djoser.urls.authtoken')),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -30,7 +25,8 @@ urlpatterns = [
     path('post/<int:pk>/delete/', PostViewSet.as_view({'get': 'list', 'delete': 'destroy'}), name='post_delete'),
     path('profile/', ProfileViewSet.as_view({'get': 'list'}), name='profile'),
     path('profile/create/', ProfileViewSet.as_view({'post': 'create'}), name='profile_create'),
-    path('profile/<int:pk>/delete/', ProfileViewSet.as_view({'get': 'list', 'delete': 'destroy'}), name='profile_delete'),
+    path('profile/<int:pk>/delete/', ProfileViewSet.as_view({'get': 'list', 'delete': 'destroy'}),
+         name='profile_delete'),
     path('groups/', GroupViewSet.as_view({'get': 'list'}), name='groups'),
     path('groups/create/', GroupViewSet.as_view({'post': 'create'}), name='groups-create'),
     path('groups/<int:pk>/delete/', GroupViewSet.as_view({'get': 'list', 'delete': 'destroy'}), name='groups-delete'),
