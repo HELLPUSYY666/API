@@ -36,15 +36,15 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    password = models.CharField(max_length=128, null=True)
-    email = models.EmailField(db_index=True, unique=True, max_length=254, null=True)
+    password = models.CharField(max_length=128)
+    email = models.EmailField(db_index=True, unique=True, max_length=254)
     first_name = models.CharField(max_length=240, null=True)
     last_name = models.CharField(max_length=255, null=True)
-    mobile = models.CharField(max_length=20, null=True)
+    mobile = models.CharField(max_length=20, null=True, unique=True)
     address = models.TextField(null=True, blank=True)
     date_joined = models.DateTimeField(default=timezone.now)
 
-    is_staff = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
 

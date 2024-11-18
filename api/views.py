@@ -24,28 +24,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = UserAPIListPagination
-    authentication_classes = [TokenAuthentication]  # Подключение аутентификации через токен
-
-
-# class UserAPIList(generics.ListCreateAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
-#     permission_classes = [IsAuthenticatedOrReadOnly]
-#     pagination_class = UserAPIListPagination
-#     authentication_classes = [TokenAuthentication]  # Подключение аутентификации через токен
-#
-#
-# class UserAPIDetail(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
-#     permission_classes = [IsAuthenticated]
-#     authentication_classes = [TokenAuthentication]  # Подключение аутентификации через токен
-#
-#
-# class UserAPIDelete(generics.RetrieveDestroyAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
-#     permission_classes = [IsAdminOrReadOnly]
+    # authentication_classes = [TokenAuthentication]
 
 
 class PostAPIListPagination(PageNumberPagination):
@@ -57,6 +36,7 @@ class PostAPIListPagination(PageNumberPagination):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    filterset_fields = ['created_at']
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -102,4 +82,4 @@ class GroupViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         group = serializer.save()
-        group.members.add(self.request.user)  # Добавляем создателя в группу
+        group.members.add(self.request.user)

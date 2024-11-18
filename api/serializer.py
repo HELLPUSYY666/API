@@ -1,3 +1,4 @@
+from django.core.validators import MaxLengthValidator
 from rest_framework import serializers
 from .models import User, Profile, Post, Group
 
@@ -7,7 +8,23 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'full_name', 'email', 'groups', 'mobile', 'date_joined']
+        fields = ['id', 'full_name', 'email', 'groups', 'mobile', 'date_joined', 'password', 'first_name', 'last_name']
+        extra_kwargs = {
+            'password': {'write_only': True, 'required': True},
+            'first_name': {'validators': [MaxLengthValidator(240)]},
+            'last_name': {'validators': [MaxLengthValidator(240)]},
+
+        }
+
+    def create(self, validated_data):
+        password = validated_data.pop('password', None)
+        if not password:
+            raise serializers.ValidationError({"password": "This field is required."})
+
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
 
     def get_full_name(self, obj):
         first_name = obj.first_name or ''
