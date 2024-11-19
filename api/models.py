@@ -94,6 +94,15 @@ class Post(models.Model):
                              related_name='posts')  # пользовтаель может создавать много постов
     title = models.CharField(max_length=255)
     content = models.TextField()
+    categories = models.ManyToManyField(Category, related_name='posts')
+
+    def like_count(self):
+        return self.likes.count()
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['user', 'title']),
+        ]
 
     def __str__(self):
         return self.title
@@ -103,6 +112,34 @@ class Group(models.Model):
     name = models.CharField(max_length=100)
     members = models.ManyToManyField(User,
                                      related_name='custom_groups')  # пользователь может быть участником многих групп и у многих групп много участников
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_groups', default='1')
+    description = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.name
+
+
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'post')
+
+    def __str__(self):
+        return f"{self.user} likes {self.post}"
+
+
+class GroupMembership(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    def get_user_groups(user):
+        return Group.objects.filter(members=user)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['user', 'group']),
+        ]

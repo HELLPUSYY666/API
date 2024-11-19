@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.exceptions import ValidationError
+from django.core.cache import cache
 
 
 class UserAPIListPagination(PageNumberPagination):
@@ -63,10 +64,20 @@ class GroupViewSet(viewsets.ModelViewSet):
         group = get_object_or_404(Group, pk=pk)
         user = request.user
 
-        if user in group.members.all():
-            return Response({'message': 'Вы уже состоите в этой группе.'}, status=status.HTTP_400_BAD_REQUEST)
+        cache_key = f"group_{group.id}_members"
+        cached_members = cache.get(cache_key)
+
+        if cached_members is not None:
+            print("Кэш найден!")
+            if user in cached_members:
+                return Response({'message': 'Вы уже состоите в этой группе.'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            print("Кэш пуст!")
+            if user in group.members.all():
+                return Response({'message': 'Вы уже состоите в этой группе.'}, status=status.HTTP_400_BAD_REQUEST)
 
         group.members.add(user)
+        cache.set(cache_key, group.members.all(), timeout=60 * 15)  # Кэшируем на 15 минут
         return Response({'message': 'Вы успешно вступили в группу!'}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'], url_path='leave')
@@ -74,10 +85,19 @@ class GroupViewSet(viewsets.ModelViewSet):
         group = get_object_or_404(Group, pk=pk)
         user = request.user
 
-        if user not in group.members.all():
-            return Response({'message': 'Вы не состоите в этой группе.'}, status=status.HTTP_400_BAD_REQUEST)
+        # Проверка кэша
+        cache_key = f"group_{group.id}_members"
+        cached_members = cache.get(cache_key)
+
+        if cached_members is not None:
+            if user not in cached_members:
+                return Response({'message': 'Вы не состоите в этой группе.'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            if user not in group.members.all():
+                return Response({'message': 'Вы не состоите в этой группе.'}, status=status.HTTP_400_BAD_REQUEST)
 
         group.members.remove(user)
+        cache.set(cache_key, group.members.all(), timeout=60 * 15)  # Кэшируем обновленный список на 15 минут
         return Response({'message': 'Вы успешно вышли из группы!'}, status=status.HTTP_200_OK)
 
     def perform_create(self, serializer):
