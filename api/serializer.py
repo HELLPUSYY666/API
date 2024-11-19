@@ -1,6 +1,6 @@
 from django.core.validators import MaxLengthValidator
 from rest_framework import serializers
-from .models import User, Profile, Post, Group
+from .models import User, Profile, Post, Group, Like, GroupMembership
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -42,6 +42,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
+    likes_count = serializers.IntegerField(source='likes.count', read_only=True)
+
 
     class Meta:
         model = Post
@@ -59,3 +61,25 @@ class GroupSerializer(serializers.ModelSerializer):
     def get_posts(self, obj):
         posts = Post.objects.filter(user__in=obj.members.all())
         return PostSerializer(posts, many=True).data
+
+
+from rest_framework import serializers
+from .models import Like, Post, User
+
+
+class LikeSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+    post = serializers.StringRelatedField()
+
+    class Meta:
+        model = Like
+        fields = ['user', 'post', 'created_at']
+
+
+class GroupMembershipSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+    post = serializers.StringRelatedField()
+
+    class Meta:
+        model = GroupMembership
+        fields = ['user', 'group', 'joined_at']

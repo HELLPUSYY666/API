@@ -4,12 +4,13 @@ from rest_framework.decorators import api_view, action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework import status, viewsets
-from .models import User, Category, Post, Profile, Group
+from .models import User, Category, Post, Profile, Group, Like
 from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
-from .serializer import UserSerializer, PostSerializer, ProfileSerializer, GroupSerializer
+from .serializer import UserSerializer, PostSerializer, ProfileSerializer, GroupSerializer, LikeSerializer, \
+    GroupMembershipSerializer
 from rest_framework.views import APIView
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser, AllowAny
 from rest_framework.exceptions import ValidationError
 from django.core.cache import cache
 
@@ -103,3 +104,34 @@ class GroupViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         group = serializer.save()
         group.members.add(self.request.user)
+
+
+class LikeCreateView(generics.CreateAPIView):
+    serializer_class = LikeSerializer
+    permission_classes = [IsAuthenticated]  # Ensure the user is authenticated
+
+    def perform_create(self, serializer):
+        post_id = self.request.data.get('post')
+        user = self.request.user
+
+        # Check if the user has already liked the post
+        if Like.objects.filter(user=user, post_id=post_id).exists():
+            raise ValidationError("You have already liked this post.")
+
+        # Create the like
+        post = Post.objects.get(id=post_id)
+        serializer.save(user=user, post=post)
+
+    def create(self, request, *args, **kwargs):
+        # To save the user from the request that is liking the post
+        if request.user.is_authenticated:  # Ensure the user is authenticated
+            request.data['user'] = request.user.id
+        else:
+            raise ValidationError("Authentication required.")
+
+        return super().create(request, *args, **kwargs)
+
+
+class GroupMembersViewSet(viewsets.ModelViewSet):
+    queryset = Group.objects.all()
+    serializer_class = GroupMembershipSerializer
