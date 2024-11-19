@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.decorators import api_view, action
+from rest_framework.generics import ListAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework import status, viewsets
@@ -10,8 +11,8 @@ from .serializer import UserSerializer, PostSerializer, ProfileSerializer, Group
     GroupMembershipSerializer
 from rest_framework.views import APIView
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser, AllowAny
-from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
+from rest_framework.exceptions import ValidationError, NotFound
 from django.core.cache import cache
 
 
@@ -106,25 +107,29 @@ class GroupViewSet(viewsets.ModelViewSet):
         group.members.add(self.request.user)
 
 
+
+
 class LikeCreateView(generics.CreateAPIView):
     serializer_class = LikeSerializer
-    permission_classes = [IsAuthenticated]  # Ensure the user is authenticated
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         post_id = self.request.data.get('post')
         user = self.request.user
 
-        # Check if the user has already liked the post
-        if Like.objects.filter(user=user, post_id=post_id).exists():
+        # Try to fetch the post, handle the case where it doesn't exist
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            raise NotFound("Post matching query does not exist.")
+
+        if Like.objects.filter(user=user, post=post).exists():
             raise ValidationError("You have already liked this post.")
 
-        # Create the like
-        post = Post.objects.get(id=post_id)
         serializer.save(user=user, post=post)
 
     def create(self, request, *args, **kwargs):
-        # To save the user from the request that is liking the post
-        if request.user.is_authenticated:  # Ensure the user is authenticated
+        if request.user.is_authenticated:
             request.data['user'] = request.user.id
         else:
             raise ValidationError("Authentication required.")
@@ -135,3 +140,11 @@ class LikeCreateView(generics.CreateAPIView):
 class GroupMembersViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupMembershipSerializer
+
+
+class PostLikesView(ListAPIView):
+    serializer_class = LikeSerializer
+
+    def get_queryset(self):
+        post_id = self.kwargs['post_id']
+        return Like.objects.filter(post_id=post_id)

@@ -24,7 +24,7 @@ urlpatterns = [
     path('groups/<int:pk>/delete/', GroupViewSet.as_view({'delete': 'destroy'}), name='groups-delete'),
     path('groups/<int:pk>/join/', GroupViewSet.as_view({'post': 'join'}), name='groups-join'),
     path('groups/<int:pk>/leave/', GroupViewSet.as_view({'post': 'leave'}), name='groups-leave'),
-    path('like/', LikeCreateView.as_view(), name='like-create'),
-
-    # после join передать access токен
+    path('group_member/<int:pk>/', GroupMembersViewSet.as_view({'get': 'list'}), name='group-members'),
+    path('post/<int:post_id>/like/', LikeCreateView.as_view(), name='post-like'),
+    path('post/<int:post_id>/likes/', PostLikesView.as_view(), name='post-likes'),
 ]

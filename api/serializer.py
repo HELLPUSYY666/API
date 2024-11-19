@@ -82,4 +82,6 @@ class GroupMembershipSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GroupMembership
-        fields = ['user', 'group', 'joined_at']
+        fields = ['user', 'joined_at', 'post']
+
+
