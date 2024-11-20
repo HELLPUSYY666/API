@@ -143,3 +143,11 @@ class GroupMembership(models.Model):
         indexes = [
             models.Index(fields=['user', 'group']),
         ]
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    content = models.TextField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+

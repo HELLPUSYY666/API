@@ -1,14 +1,14 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.decorators import api_view, action
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework import status, viewsets
 from .models import User, Category, Post, Profile, Group, Like
 from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from .serializer import UserSerializer, PostSerializer, ProfileSerializer, GroupSerializer, LikeSerializer, \
-    GroupMembershipSerializer
+    GroupMembershipSerializer, CommentSerializer
 from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
@@ -107,8 +107,6 @@ class GroupViewSet(viewsets.ModelViewSet):
         group.members.add(self.request.user)
 
 
-
-
 class LikeCreateView(generics.CreateAPIView):
     serializer_class = LikeSerializer
     permission_classes = [IsAuthenticated]
@@ -148,3 +146,29 @@ class PostLikesView(ListAPIView):
     def get_queryset(self):
         post_id = self.kwargs['post_id']
         return Like.objects.filter(post_id=post_id)
+
+
+class CommentView(CreateAPIView):
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        post_id = self.request.data.get('post_id')
+
+        if not post_id:
+            raise ValueError("Post ID is required to create a comment.")
+
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            raise ValueError("Post with the given ID does not exist.")
+
+        serializer.save(user=user, post=post)
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        return Response(
+            {"message": "Comment added successfully!", "data": response.data},
+            status=status.HTTP_201_CREATED
+        )

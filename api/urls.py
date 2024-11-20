@@ -27,4 +27,6 @@ urlpatterns = [
     path('group_member/<int:pk>/', GroupMembersViewSet.as_view({'get': 'list'}), name='group-members'),
     path('post/<int:post_id>/like/', LikeCreateView.as_view(), name='post-like'),
     path('post/<int:post_id>/likes/', PostLikesView.as_view(), name='post-likes'),
+    path('comments/', CommentView.as_view(), name='create-comment'),
+
 ]
