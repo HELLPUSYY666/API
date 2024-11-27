@@ -29,4 +29,5 @@ urlpatterns = [
     path('post/<int:post_id>/likes/', PostLikesView.as_view(), name='post-likes'),
     path('comments/', CommentView.as_view(), name='create-comment'),
 
+    path('index/', index, name='index'),
 ]

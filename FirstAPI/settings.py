@@ -25,11 +25,14 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'daphne',
     'django.contrib.staticfiles',
     'rest_framework',
     'api',
     'rest_framework.authtoken',
     'djoser',
+    'channels',
+
 ]
 
 MIDDLEWARE = [
@@ -47,7 +50,9 @@ ROOT_URLCONF = 'FirstAPI.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR.joinpath('templates'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -61,6 +66,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'FirstAPI.wsgi.application'
+ASGI_APPLICATION = 'FirstAPI.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -175,4 +181,12 @@ CACHES = {
         },
         'KEY_PREFIX': 'myapp',
     }
+}
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
 }

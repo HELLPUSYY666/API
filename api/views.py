@@ -115,7 +115,6 @@ class LikeCreateView(generics.CreateAPIView):
         post_id = self.request.data.get('post')
         user = self.request.user
 
-        # Try to fetch the post, handle the case where it doesn't exist
         try:
             post = Post.objects.get(id=post_id)
         except Post.DoesNotExist:
@@ -172,3 +171,7 @@ class CommentView(CreateAPIView):
             {"message": "Comment added successfully!", "data": response.data},
             status=status.HTTP_201_CREATED
         )
+
+
+def index(request):
+    return render(request, 'api/index.html')
