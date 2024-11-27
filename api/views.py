@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.decorators import api_view, action
@@ -5,15 +6,16 @@ from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework import status, viewsets
-from .models import User, Category, Post, Profile, Group, Like
+from .models import User, Category, Post, Profile, Group, Like, Notification
 from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from .serializer import UserSerializer, PostSerializer, ProfileSerializer, GroupSerializer, LikeSerializer, \
-    GroupMembershipSerializer, CommentSerializer
+    GroupMembershipSerializer, CommentSerializer, NotificationSerializer
 from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.exceptions import ValidationError, NotFound
 from django.core.cache import cache
+from .utils import send_notification_to_user
 
 
 class UserAPIListPagination(PageNumberPagination):
@@ -175,3 +177,31 @@ class CommentView(CreateAPIView):
 
 def index(request):
     return render(request, 'api/index.html')
+
+
+class NotificationListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+        serializer = NotificationSerializer(notifications, many=True)
+        return Response(serializer.data)
+
+
+class MarkNotificationReadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, notification_id):
+        try:
+            notification = Notification.objects.get(id=notification_id, user=request.user)
+            notification.is_read = True
+            notification.save()
+            return Response({'status': 'success', 'message': 'Notification marked as read'})
+        except Notification.DoesNotExist:
+            return Response({'status': 'error', 'message': 'Notification not found'}, status=404)
+
+
+def some_view(request):
+    user = request.user
+    send_notification_to_user(user, "Пример уведомления", "У вас новое сообщение!")
+    return HttpResponse("Уведомление отправлено!")

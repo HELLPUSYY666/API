@@ -1,6 +1,6 @@
 from django.core.validators import MaxLengthValidator
 from rest_framework import serializers
-from .models import User, Profile, Post, Group, Like, GroupMembership, Comment
+from .models import User, Profile, Post, Group, Like, GroupMembership, Comment, Notification
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -87,3 +87,9 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = '__all__'
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id', 'title', 'message', 'is_read', 'created_at']

@@ -28,6 +28,8 @@ urlpatterns = [
     path('post/<int:post_id>/like/', LikeCreateView.as_view(), name='post-like'),
     path('post/<int:post_id>/likes/', PostLikesView.as_view(), name='post-likes'),
     path('comments/', CommentView.as_view(), name='create-comment'),
-
+    path('notifications/', NotificationListView.as_view(), name='notifications'),
+    path('notifications/<int:notification_id>/read/', MarkNotificationReadView.as_view(),
+         name='mark_notification_read'),
     path('index/', index, name='index'),
 ]
