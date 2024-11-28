@@ -21,7 +21,7 @@ jobs:
           pip install -r requirements.txt
       - name: Run Tests
         run: |
-          cd ./FirstAPI
+          cd ./FirstAPI/manage.py
           export SECRET_KEY='django-insecure-dummy-secret'
           python manage.py test
       - name: Update passed icon
