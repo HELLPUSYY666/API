@@ -22,7 +22,7 @@ jobs:
       - name: Run Tests
         run: |
           cd ./FirstAPI
-          echo "SECRET_KEY = 'django-insecure-dummy-secret'" > FirstAPI/secrets.py
+          echo "SECRET_KEY = 'django-insecure-dummy-secret'" > /Users/zakariyapolevchishikov/myBestDjangoProjects/FirstAPI/FirstAPI/secrets.py
           python manage.py test
       - name: Update passed icon
         uses: Sibz/github-status-action@v1
