@@ -32,6 +32,7 @@ Ensure you have Docker and Docker Compose installed on your system.
 ```bash
 git clone https://github.com/username/your-project-name.git
 cd your-project-name
+```
 
 ### Build and Run the Application
 - Build the containers:
