@@ -25,7 +25,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          cd /FirstAPI/FirstAPI
+          cd /Users/zakariyapolevchishikov/myBestDjangoProjects/FirstAPI/FirstAPI
           export SECRET_KEY='django-insecure-dummy-secret'
           python manage.py test
 
