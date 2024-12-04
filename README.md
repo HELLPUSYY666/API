@@ -37,28 +37,28 @@ cd your-project-name
 ### Build and Run the Application
 - Build the containers:
 
-docker-compose build
+```docker-compose build```
 
 - Start the application:
 
-docker-compose up
+```docker-compose up```
 
 This command will start the development server and make the application available at http://localhost:8000.
 
 ### Run Migrations
-To set up the database, run:
-docker-compose run web python manage.py migrate
+- To set up the database, run:
+```docker-compose run web python manage.py migrate```
 
 ### Create a Superuser
-Create a superuser for accessing the Django admin:
-docker-compose run web python manage.py createsuperuser
+- Create a superuser for accessing the Django admin:
+```docker-compose run web python manage.py createsuperuser```
 
 Follow the prompts to set up your superuser account.
 
 ### Run Unit Tests
-To ensure the application is functioning correctly, run the unit tests with:
+- To ensure the application is functioning correctly, run the unit tests with:
 
-docker-compose run web python manage.py test
+```docker-compose run web python manage.py test```
 
 ### Usage
 
