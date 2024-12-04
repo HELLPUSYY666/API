@@ -70,7 +70,7 @@ Follow the prompts to set up your superuser account.
 
 - This project is licensed under the MIT License. See the LICENSE file for more details.
 
-###b Author
+### Author
 
 Developer: Zakariya
 
